@@ -1,7 +1,7 @@
 import galleryItems from "./gallery-items.js";
 // console.log(galleryItems);
 
-const makeGalleryItemMarkup = ({ preview, original, description }) => {
+const makeGalleryItemMarkup = ({ preview, original, description }, index) => {
   return `
   <li class="gallery__item">
       <a
@@ -12,12 +12,14 @@ const makeGalleryItemMarkup = ({ preview, original, description }) => {
           class="gallery__image"
           src=${preview}
           data-source=${original}
+          data-index=${index}
           alt=${description}
         />
       </a>
     </li>
     `;
 };
+
 const refs = {
   galleryContainer: document.querySelector(".js-gallery"),
   lightbox: document.querySelector(".js-lightbox"),
@@ -39,11 +41,17 @@ function onGalleryContainerClick(event) {
   if (!event.target.classList.contains("gallery__image")) {
     return;
   }
+  window.addEventListener("keydown", onArrowPress);
   window.addEventListener("keydown", onEscKeyPress);
   refs.lightbox.classList.add("is-open");
   refs.lightboxImage.src = event.target.dataset.source;
+  refs.lightboxImage.index = event.target.dataset.index;
+  // console.log(event.target.dataset.index);
+  // console.log(parseInt(refs.lightboxImage.index) + 1);
 }
+
 function onLightboxClose(event) {
+  window.removeEventListener("keydown", onArrowPress);
   window.removeEventListener("keydown", onEscKeyPress);
   refs.lightbox.classList.remove("is-open");
   refs.lightboxImage.src = "";
@@ -54,27 +62,25 @@ function onEscKeyPress(event) {
     onLightboxClose();
   }
 }
-window.addEventListener("keydown", onArrowRightPress);
-function onArrowRightPress(event) {
-  const ArrowRightCode = "ArrowRight";
-  if (event.code === ArrowRightCode) {
-    for (let i = 0; i < galleryItems.length; i++) {
-      let currentImg = event.target;
-      let nextImage = currentImg
-        .closest(".gallery__item")
-        .nextElementSibling.querySelector(".gallery__link");
-      refs.lightboxImage.src = nextImage.firstElementChild.dataset.source;
-    }
+
+function onArrowPress(event) {
+  if (event.code === "ArrowRight") {
+    // for (let i = 0; i < galleryItems.length; i++) {
+    refs.lightboxImage.src =
+      galleryItems[parseInt(refs.lightboxImage.index) + 1].original;
+  } else if (event.code === "ArrowLeft") {
+    refs.lightboxImage.src =
+      galleryItems[parseInt(refs.lightboxImage.index) - 1].original;
   }
 }
-window.addEventListener("keydown", onArrowLeftPress);
-function onArrowLeftPress(event) {
-  const ArrowLeftCode = "ArrowLeft";
-  if (event.code === ArrowLeftCode) {
-    let currentImg = event.target;
-    const previousImage = currentImg
-      .closest(".gallery__item")
-      .previousElementSibling.querySelector(".gallery__link");
-    refs.lightboxImage.src = previousImage.firstElementChild.dataset.source;
-  }
-}
+
+// function onArrowLeftPress(event) {
+//   const ArrowLeftCode = "ArrowLeft";
+//   if (event.code === ArrowLeftCode) {
+//     let currentImg = event.target;
+//     const previousImage = currentImg
+//       .closest(".gallery__item")
+//       .previousElementSibling.querySelector(".gallery__link");
+//     refs.lightboxImage.src = previousImage.firstElementChild.dataset.source;
+//   }
+// }
