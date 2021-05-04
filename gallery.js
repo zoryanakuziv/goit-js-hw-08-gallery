@@ -1,5 +1,5 @@
 import galleryItems from "./gallery-items.js";
-// console.log(galleryItems);
+console.log(galleryItems);
 
 const makeGalleryItemMarkup = ({ preview, original, description }, index) => {
   return `
@@ -45,9 +45,7 @@ function onGalleryContainerClick(event) {
   window.addEventListener("keydown", onEscKeyPress);
   refs.lightbox.classList.add("is-open");
   refs.lightboxImage.src = event.target.dataset.source;
-  refs.lightboxImage.index = event.target.dataset.index;
-  // console.log(event.target.dataset.index);
-  // console.log(parseInt(refs.lightboxImage.index) + 1);
+  refs.lightboxImage.dataset.index = event.target.dataset.index;
 }
 
 function onLightboxClose(event) {
@@ -64,13 +62,16 @@ function onEscKeyPress(event) {
 }
 
 function onArrowPress(event) {
-  if (event.code === "ArrowRight") {
-    // for (let i = 0; i < galleryItems.length; i++) {
+  let currentIndex = parseInt(refs.lightboxImage.dataset.index);
+
+  if (event.code === "ArrowRight" && currentIndex <= galleryItems.length - 1) {
+    refs.lightboxImage.dataset.index = parseInt(currentIndex) + 1;
     refs.lightboxImage.src =
-      galleryItems[parseInt(refs.lightboxImage.index) + 1].original;
-  } else if (event.code === "ArrowLeft") {
+      galleryItems[parseInt(refs.lightboxImage.dataset.index) + 1].original;
+  } else if (event.code === "ArrowLeft" && currentIndex !== 0) {
+    refs.lightboxImage.dataset.index = parseInt(currentIndex) - 1;
     refs.lightboxImage.src =
-      galleryItems[parseInt(refs.lightboxImage.index) - 1].original;
+      galleryItems[parseInt(refs.lightboxImage.dataset.index) - 1].original;
   }
 }
 
